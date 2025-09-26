@@ -1,0 +1,23 @@
+{%- comment -%}
+  Snippet: BaziCash History Section
+  Descrição: Seção de histórico de transações com abas
+  Uso: {% render 'bazicash-history-section' %}
+{%- endcomment -%}
+
+<div class="bazicash-section">
+  <h3>📊 Histórico de Transações</h3>
+  <div class="bazicash-history-tabs">
+    <button class="bazicash-tab-btn active" data-tab="all">
+      <span>📋 Todas</span>
+    </button>
+    <button class="bazicash-tab-btn" data-tab="ganhos">
+      <span>📈 Ganhos</span>
+    </button>
+    <button class="bazicash-tab-btn" data-tab="resgates">
+      <span>📉 Resgates</span>
+    </button>
+  </div>
+  <div id="bazicashHistory" class="bazicash-history-content">
+    <div class="bazicash-loading">Carregando histórico...</div>
+  </div>
+</div>

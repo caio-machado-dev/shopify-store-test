@@ -1,0 +1,39 @@
+{%- comment -%}
+  Snippet: BaziCash Balance Section
+  Descrição: Seção de saldo disponível com estatísticas
+  Uso: {% render 'bazicash-balance-section' %}
+{%- endcomment -%}
+
+<div class="bazicash-section">
+  <h3>💳 Saldo Disponível</h3>
+  <div class="bazicash-balance">
+    <div class="bazicash-balance-icon">💰</div>
+    <span id="bazicashBalance">Carregando...</span>
+    <p class="bazicash-balance-subtitle">Disponível para resgate</p>
+  </div>
+
+  <!-- Estatísticas adicionais -->
+  <div class="bazicash-stats">
+    <div class="bazicash-stat-item">
+      <div class="stat-icon">📈</div>
+      <div class="stat-content">
+        <div class="stat-value" id="totalGanhos">R$ 260,50</div>
+        <div class="stat-label">Total de Ganhos</div>
+      </div>
+    </div>
+    <div class="bazicash-stat-item">
+      <div class="stat-icon">💸</div>
+      <div class="stat-content">
+        <div class="stat-value" id="totalResgates">R$ 135,00</div>
+        <div class="stat-label">Total Resgatado</div>
+      </div>
+    </div>
+    <div class="bazicash-stat-item">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-content">
+        <div class="stat-value" id="economiaGerada">48%</div>
+        <div class="stat-label">Economia Gerada</div>
+      </div>
+    </div>
+  </div>
+</div>

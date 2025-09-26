@@ -1,0 +1,16 @@
+{%- comment -%}
+  Snippet: BaziCash Redeem Section
+  Descrição: Seção de resgate de BaziCash
+  Uso: {% render 'bazicash-redeem-section' %}
+{%- endcomment -%}
+
+<div class="bazicash-section">
+  <h3>🎁 Resgate de BaziCash</h3>
+  <div class="bazicash-redeem">
+    <input type="number" id="redeemAmount" placeholder="Digite o valor para resgate" min="1">
+    <button onclick="redeemBazicash()" class="bazicash-redeem-btn">
+      <span class="btn-icon">💸</span>
+      Resgatar
+    </button>
+  </div>
+</div>

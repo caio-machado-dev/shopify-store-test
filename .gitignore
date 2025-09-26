@@ -1,0 +1,127 @@
+# Shopify Theme Development
+# https://shopify.dev/themes/tools/cli
+
+# Configuration files
+config/settings_data.json
+config.yml
+.shopifyignore
+
+# Local development
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Node modules and dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
+*.tmp.*
+
+# Logs
+logs/
+*.log
+
+# Build output
+dist/
+build/
+
+# Shopify CLI
+.shopify/
+
+# Backup files
+*.backup
+*.bak
+*_backup
+*_bak
+
+# Compressed files
+*.zip
+*.tar.gz
+*.rar
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/

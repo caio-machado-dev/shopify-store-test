@@ -1,0 +1,27 @@
+{%- comment -%}
+  Snippet: BaziCash Modal
+  Descrição: Modal principal do sistema BaziCash
+  Uso: {% render 'bazicash-modal' %}
+{%- endcomment -%}
+
+<!-- Modal Bazicash -->
+<div id="bazicashModal" class="bazicash-modal">
+  <div class="bazicash-modal-content">
+    <div class="bazicash-modal-header">
+      <div class="bazicash-header-content">
+        <h2>💰 BaziCash</h2>
+        <p class="bazicash-tagline">Seu programa de cashback inteligente</p>
+      </div>
+      <span class="bazicash-close" onclick="closeBazicashModal()">&times;</span>
+    </div>
+    <div class="bazicash-modal-body">
+      {% render 'bazicash-balance-section' %}
+      {% render 'bazicash-redeem-section' %}
+      {% render 'bazicash-history-section' %}
+
+      <div class="bazicash-section">
+        <div id="bazicashMessage" class="bazicash-message"></div>
+      </div>
+    </div>
+  </div>
+</div>

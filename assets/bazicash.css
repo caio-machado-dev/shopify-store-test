@@ -1,0 +1,644 @@
+/* ==========================================
+   BAZICASH - Sistema de Cashback
+   Arquivo CSS modularizado para melhor manutenção
+   ========================================== */
+
+/* === SISTEMA DE CORES BAZICASH - ESQUEMA PRETO E BRANCO === */
+:root {
+  /* Cores principais - esquema monocromático */
+  --bazicash-primary: #121212;        /* Preto principal */
+  --bazicash-primary-dark: #000000;   /* Preto puro */
+  --bazicash-primary-light: #333333;  /* Cinza escuro */
+  --bazicash-secondary: #6b6b6b;      /* Cinza médio */
+  --bazicash-secondary-dark: #555555; /* Cinza mais escuro */
+  --bazicash-secondary-light: #888888; /* Cinza mais claro */
+
+  /* Cores de status mantidas */
+  --bazicash-success: #28A745;
+  --bazicash-success-light: #D4EDDA;
+  --bazicash-danger: #DC3545;
+  --bazicash-danger-light: #F8D7DA;
+  --bazicash-warning: #FFC107;
+  --bazicash-warning-light: #FFF3CD;
+
+  /* Cores neutras */
+  --bazicash-dark: #121212;          /* Preto */
+  --bazicash-light: #fafaf9;         /* Off-white */
+  --bazicash-white: #ffffff;         /* Branco puro */
+  --bazicash-gray: #6b6b6b;          /* Cinza médio */
+  --bazicash-gray-light: #e5e5e5;    /* Cinza claro */
+  --bazicash-border: #dddddd;        /* Borda cinza */
+
+  /* Gradientes monocromáticos */
+  --bazicash-gradient-primary: linear-gradient(135deg, #121212 0%, #000000 100%);
+  --bazicash-gradient-secondary: linear-gradient(135deg, #6b6b6b 0%, #555555 100%);
+  --bazicash-gradient-light: linear-gradient(135deg, #333333 0%, #121212 100%);
+
+  /* Sombras neutras */
+  --bazicash-shadow: 0 4px 15px rgba(18, 18, 18, 0.15);
+  --bazicash-shadow-lg: 0 8px 25px rgba(18, 18, 18, 0.2);
+  --bazicash-shadow-dark: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* === BOTÃO FLUTUANTE === */
+.floating-button {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 1000;
+  background: var(--bazicash-gradient-primary);
+  color: var(--bazicash-white);
+  border: none;
+  border-radius: 12px 0 0 12px;
+  padding: 12px 8px;
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  min-width: 60px;
+  box-shadow: var(--bazicash-shadow-lg);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { box-shadow: var(--bazicash-shadow-lg); }
+  50% { box-shadow: -8px 0 25px rgba(18, 18, 18, 0.3); }
+  100% { box-shadow: var(--bazicash-shadow-lg); }
+}
+
+.floating-button-icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.floating-button-text {
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  writing-mode: horizontal-tb;
+  white-space: nowrap;
+}
+
+.floating-button-badge {
+  background: var(--bazicash-white);
+  color: var(--bazicash-primary);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.floating-button:hover {
+  transform: translateY(-50%) translateX(-6px);
+  box-shadow: -12px 0 30px rgba(18, 18, 18, 0.4);
+  text-decoration: none;
+  color: var(--bazicash-white);
+  background: var(--bazicash-gradient-light);
+  animation-play-state: paused;
+}
+
+.floating-button:hover .floating-button-badge {
+  background: var(--bazicash-white);
+  color: var(--bazicash-primary);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* === MODAL STYLES === */
+.bazicash-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.bazicash-modal-content {
+  background-color: #fefefe;
+  margin: 2% auto;
+  padding: 0;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bazicash-modal-header {
+  padding: 24px;
+  background: var(--bazicash-gradient-primary);
+  color: var(--bazicash-white);
+  border-radius: 10px 10px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(18, 18, 18, 0.15);
+}
+
+.bazicash-header-content h2 {
+  margin: 0 0 4px 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.bazicash-tagline {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+.bazicash-close {
+  color: white;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.bazicash-close:hover {
+  opacity: 0.7;
+}
+
+.bazicash-modal-body {
+  padding: 30px;
+}
+
+.bazicash-section {
+  margin-bottom: 30px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bazicash-section:nth-child(1) { animation-delay: 0.1s; }
+.bazicash-section:nth-child(2) { animation-delay: 0.2s; }
+.bazicash-section:nth-child(3) { animation-delay: 0.3s; }
+.bazicash-section:nth-child(4) { animation-delay: 0.4s; }
+
+.bazicash-section h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+/* === SALDO === */
+.bazicash-balance {
+  background: var(--bazicash-gradient-secondary);
+  padding: 24px;
+  border-radius: 12px;
+  text-align: center;
+  border: none;
+  box-shadow: var(--bazicash-shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.bazicash-balance::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+}
+
+.bazicash-balance-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+#bazicashBalance {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--bazicash-white);
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bazicash-balance-subtitle {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* === ESTATÍSTICAS === */
+.bazicash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.bazicash-stat-item {
+  background: var(--bazicash-white);
+  border: 2px solid var(--bazicash-border);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.bazicash-stat-item:hover {
+  border-color: var(--bazicash-primary);
+  box-shadow: var(--bazicash-shadow);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--bazicash-primary);
+  margin-bottom: 4px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--bazicash-gray);
+  font-weight: 500;
+}
+
+/* === RESGATE === */
+.bazicash-redeem {
+  display: flex;
+  gap: 10px;
+}
+
+#redeemAmount {
+  flex: 1;
+  padding: 14px 16px;
+  border: 2px solid var(--bazicash-border);
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background-color: var(--bazicash-white);
+}
+
+#redeemAmount:focus {
+  outline: none;
+  border-color: var(--bazicash-primary);
+  box-shadow: 0 0 0 3px rgba(18, 18, 18, 0.1);
+}
+
+.bazicash-redeem-btn {
+  background: var(--bazicash-gradient-primary);
+  color: var(--bazicash-white);
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  box-shadow: var(--bazicash-shadow);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.btn-icon {
+  font-size: 18px;
+}
+
+.bazicash-redeem-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--bazicash-primary-light) 0%, var(--bazicash-primary) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--bazicash-shadow-lg);
+}
+
+.bazicash-redeem-btn:active:not(:disabled) {
+  transform: translateY(0px);
+}
+
+.bazicash-redeem-btn:disabled {
+  background: var(--bazicash-gray-light);
+  color: var(--bazicash-gray);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* === MENSAGENS === */
+.bazicash-message {
+  padding: 16px 20px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  display: none;
+  box-shadow: var(--bazicash-shadow-dark);
+  animation: slideInMessage 0.3s ease-out;
+}
+
+@keyframes slideInMessage {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bazicash-message.success {
+  background: var(--bazicash-success-light);
+  color: var(--bazicash-success);
+  border: 1px solid var(--bazicash-success);
+  display: block;
+}
+
+.bazicash-message.error {
+  background: var(--bazicash-danger-light);
+  color: var(--bazicash-danger);
+  border: 1px solid var(--bazicash-danger);
+  display: block;
+}
+
+.bazicash-message.warning {
+  background: var(--bazicash-warning-light);
+  color: var(--bazicash-warning);
+  border: 1px solid var(--bazicash-warning);
+  display: block;
+}
+
+/* === HISTÓRICO === */
+.bazicash-history-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+}
+
+.bazicash-tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid var(--bazicash-primary);
+  background-color: var(--bazicash-white);
+  color: var(--bazicash-primary);
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.bazicash-tab-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--bazicash-gradient-primary);
+  transition: left 0.3s ease;
+  z-index: 0;
+}
+
+.bazicash-tab-btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.bazicash-tab-btn.active::before,
+.bazicash-tab-btn:hover::before {
+  left: 0;
+}
+
+.bazicash-tab-btn.active,
+.bazicash-tab-btn:hover {
+  color: var(--bazicash-white);
+  border-color: var(--bazicash-primary);
+  box-shadow: var(--bazicash-shadow);
+}
+
+.bazicash-history-content {
+  max-height: 300px;
+  min-height: 200px;
+  overflow-y: auto;
+  border: 2px solid var(--bazicash-border);
+  border-radius: 12px;
+  padding: 20px;
+  background-color: var(--bazicash-white);
+  box-shadow: var(--bazicash-shadow-dark);
+}
+
+.bazicash-loading {
+  text-align: center;
+  color: var(--bazicash-gray);
+  font-style: italic;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.bazicash-loading::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--bazicash-gray-light);
+  border-top: 2px solid var(--bazicash-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.bazicash-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--bazicash-border);
+  min-height: 60px;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: slideInUp 0.3s ease-out forwards;
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bazicash-history-item:hover {
+  background-color: rgba(18, 18, 18, 0.03);
+  border-radius: 8px;
+  margin: 0 -15px;
+  padding: 15px 15px;
+  transition: all 0.2s ease;
+}
+
+.bazicash-history-item:last-child {
+  border-bottom: none;
+}
+
+.bazicash-history-info {
+  flex: 1;
+}
+
+.bazicash-history-description {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.bazicash-history-date {
+  font-size: 12px;
+  color: var(--bazicash-gray);
+  line-height: 1.2;
+}
+
+.bazicash-history-amount {
+  font-size: 16px;
+  font-weight: bold;
+  min-width: 80px;
+  text-align: right;
+}
+
+.bazicash-history-amount.ganho {
+  color: var(--bazicash-success);
+  background-color: var(--bazicash-success-light);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--bazicash-success);
+}
+
+.bazicash-history-amount.resgate {
+  color: var(--bazicash-danger);
+  background-color: var(--bazicash-danger-light);
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--bazicash-danger);
+}
+
+.bazicash-empty-history {
+  text-align: center;
+  color: var(--bazicash-gray);
+  padding: 30px;
+  font-style: italic;
+}
+
+/* === RESPONSIVIDADE === */
+@media screen and (max-width: 749px) {
+  .floating-button {
+    padding: 10px 6px;
+    min-height: 120px;
+    min-width: 55px;
+    border-radius: 10px 0 0 10px;
+  }
+
+  .floating-button-icon {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .floating-button-text {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .floating-button-badge {
+    font-size: 8px;
+    padding: 1px 4px;
+  }
+
+  .bazicash-modal-content {
+    margin: 10% auto;
+    width: 95%;
+  }
+
+  .bazicash-modal-body {
+    padding: 20px;
+  }
+
+  .bazicash-redeem {
+    flex-direction: column;
+  }
+
+  #redeemAmount {
+    margin-bottom: 10px;
+  }
+
+  .bazicash-history-tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bazicash-history-content {
+    max-height: 250px;
+  }
+
+  .bazicash-history-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .bazicash-history-amount {
+    text-align: left;
+    min-width: auto;
+  }
+
+  .bazicash-stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .bazicash-stat-item {
+    padding: 12px;
+  }
+
+  .stat-icon {
+    font-size: 18px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,83 @@
+{%- comment -%}
+===========================================
+BAZICASH - Sistema de Cashback
+Seção modular para melhor manutenção
+===========================================
+
+Arquivos relacionados:
+- CSS: assets/bazicash.css
+- JavaScript: assets/bazicash.js
+- Snippets:
+  - snippets/bazicash-floating-button.liquid
+  - snippets/bazicash-modal.liquid
+  - snippets/bazicash-balance-section.liquid
+  - snippets/bazicash-redeem-section.liquid
+  - snippets/bazicash-history-section.liquid
+{%- endcomment -%}
+
+{%- comment -%} Incluir CSS do BaziCash {%- endcomment -%}
+{{ 'bazicash.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%} Renderizar botão flutuante {%- endcomment -%}
+{% render 'bazicash-floating-button' %}
+
+{%- comment -%} Renderizar modal principal {%- endcomment -%}
+{% render 'bazicash-modal' %}
+
+{%- comment -%} Configuração JavaScript {%- endcomment -%}
+<script>
+  // Configurar email do cliente para o JavaScript
+  {% if customer %}
+    window.bazicashCustomerEmail = '{{ customer.email }}';
+  {% else %}
+    window.bazicashCustomerEmail = null;
+  {% endif %}
+</script>
+
+{%- comment -%} Incluir JavaScript do BaziCash {%- endcomment -%}
+{{ 'bazicash.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "BaziCash Cashback",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Configurações do Botão Flutuante"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto do botão",
+      "default": "BaziCash",
+      "info": "Este texto é usado internamente. O botão sempre mostra 'BaziCash' visualmente."
+    },
+    {
+      "type": "header",
+      "content": "Configurações Avançadas"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_demo_mode",
+      "label": "Modo demonstração",
+      "default": true,
+      "info": "Permite visualizar o BaziCash mesmo sem estar logado (para testes)"
+    },
+    {
+      "type": "header",
+      "content": "ℹ️ Informações"
+    },
+    {
+      "type": "paragraph",
+      "content": "Este é um sistema modular de cashback. Os estilos estão em `assets/bazicash.css` e a lógica em `assets/bazicash.js`."
+    }
+  ],
+  "presets": [
+    {
+      "name": "BaziCash Cashback"
+    }
+  ]
+}
+{% endschema %}

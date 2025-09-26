@@ -1,0 +1,13 @@
+{%- comment -%}
+  Snippet: BaziCash Floating Button
+  Descrição: Botão flutuante do sistema BaziCash
+  Uso: {% render 'bazicash-floating-button' %}
+{%- endcomment -%}
+
+{%- if section.settings.button_text != blank -%}
+  <button onclick="openBazicashModal()" class="floating-button">
+    <div class="floating-button-icon">💰</div>
+    <div class="floating-button-text">BaziCash</div>
+    <div class="floating-button-badge" id="floatingButtonBadge">R$ 125,50</div>
+  </button>
+{%- endif -%}
