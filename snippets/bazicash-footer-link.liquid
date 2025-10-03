@@ -1,0 +1,70 @@
+{%- comment -%}
+  Snippet: BaziCash Footer Link
+  Descrição: Link para a página BaziCash no footer
+  Uso: {% render 'bazicash-footer-link' %}
+{%- endcomment -%}
+
+{%- liquid
+  # Buscar saldo do StoreCredit do cliente logado
+  assign store_credit_balance = 0
+  if customer and customer.store_credit_accounts.size > 0
+    assign store_credit_balance = customer.store_credit_accounts.first.balance.amount
+  endif
+-%}
+
+<style>
+  .footer-bazicash-block {
+    position: relative;
+  }
+
+  .footer-bazicash-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+  }
+
+  .footer-bazicash-link:hover {
+    opacity: 0.8;
+    transform: translateX(3px);
+  }
+
+  .footer-bazicash-icon {
+    font-size: 1.2rem;
+  }
+
+  .footer-bazicash-balance {
+    display: inline-block;
+    background: rgba(18, 18, 18, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+  }
+
+  .footer-bazicash-new-badge {
+    display: inline-block;
+    background: #121212;
+    color: #ffffff;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+  }
+</style>
+
+<div class="footer-bazicash-block">
+  <a href="/pages/bazicash" class="footer-bazicash-link link link--text list-menu__item list-menu__item--link">
+    <span class="footer-bazicash-icon">💰</span>
+    <span>BaziCash - Programa de Cashback</span>
+    {%- if customer -%}
+      <span class="footer-bazicash-balance">R$ {{ store_credit_balance | money_without_currency }}</span>
+    {%- else -%}
+      <span class="footer-bazicash-new-badge">Novo</span>
+    {%- endif -%}
+  </a>
+</div>
