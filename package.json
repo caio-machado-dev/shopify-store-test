@@ -1,0 +1,30 @@
+{
+  "name": "bazicash-shopify-theme",
+  "version": "1.0.0",
+  "description": "BaziCash Store Credit Theme + Backend App",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npm run server:dev",
+    "server:dev": "cd server && npm run dev",
+    "server:start": "cd server && npm start",
+    "server:install": "cd server && npm install",
+    "setup-proxy": "cd server && npm run setup-proxy",
+    "theme:dev": "shopify theme dev",
+    "theme:push": "shopify theme push"
+  },
+  "workspaces": [
+    "server"
+  ],
+  "keywords": [
+    "shopify",
+    "theme",
+    "store-credit",
+    "bazicash"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

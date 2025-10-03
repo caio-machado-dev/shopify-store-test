@@ -1,91 +1,115 @@
 /**
  * ==========================================
  * BAZICASH - Sistema de Cashback
- * Arquivo JavaScript modularizado para melhor manutenção
+ * Integrado com API via App Proxy
  * ==========================================
  */
 
-// === CONFIGURAÇÃO E DADOS MOCKADOS ===
+// === CONFIGURAÇÃO ===
 const BaziCash = {
+  // Configuração da API
+  API_BASE_URL: '/apps/bazicash',
+  
   // Variáveis globais
   customerEmail: null,
+  customerCPF: null, // CPF do cliente (obrigatório para API)
 
-  // DADOS MOCKADOS PARA DESENVOLVIMENTO
-  // TODO: Remover quando integrar com SDK real
-  MOCK_DATA: {
-    balance: 125.50,
-    history: [
-      {
-        id: 1,
-        type: 'ganho',
-        amount: 45.30,
-        description: 'Compra #1001 - Tênis Nike',
-        date: '2024-01-15',
-        timestamp: '2024-01-15T10:30:00Z'
-      },
-      {
-        id: 2,
-        type: 'ganho',
-        amount: 23.50,
-        description: 'Compra #1002 - Camiseta Adidas',
-        date: '2024-01-18',
-        timestamp: '2024-01-18T14:20:00Z'
-      },
-      {
-        id: 3,
-        type: 'resgate',
-        amount: -15.00,
-        description: 'Resgate utilizado na compra #1003',
-        date: '2024-01-20',
-        timestamp: '2024-01-20T16:45:00Z'
-      },
-      {
-        id: 4,
-        type: 'ganho',
-        amount: 67.20,
-        description: 'Compra #1004 - Kit Esportivo',
-        date: '2024-01-25',
-        timestamp: '2024-01-25T11:15:00Z'
-      },
-      {
-        id: 5,
-        type: 'resgate',
-        amount: -25.00,
-        description: 'Resgate utilizado na compra #1005',
-        date: '2024-01-28',
-        timestamp: '2024-01-28T09:30:00Z'
-      },
-      {
-        id: 6,
-        type: 'ganho',
-        amount: 34.80,
-        description: 'Compra #1006 - Shorts Nike',
-        date: '2024-02-02',
-        timestamp: '2024-02-02T13:20:00Z'
-      },
-      {
-        id: 7,
-        type: 'resgate',
-        amount: -10.50,
-        description: 'Resgate utilizado na compra #1007',
-        date: '2024-02-05',
-        timestamp: '2024-02-05T15:10:00Z'
-      },
-      {
-        id: 8,
-        type: 'ganho',
-        amount: 89.70,
-        description: 'Compra #1008 - Jaqueta Puma',
-        date: '2024-02-10',
-        timestamp: '2024-02-10T12:45:00Z'
+  // Cache de dados
+  cachedBalance: null,
+  cachedHistory: null,
+  
+  // Flag para modo de desenvolvimento (fallback para mock)
+  USE_MOCK_DATA: true, // Defina como true para usar dados mockados
+
+  // === FUNÇÕES DE API ===
+  /**
+   * Faz chamada para a API do BaziCash via App Proxy
+   * @param {string} endpoint - 'balance' ou 'withdraw'
+   * @param {object} options - Opções da requisição (method, body, etc)
+   */
+  async callAPI(endpoint, options = {}) {
+    try {
+      const url = `${this.API_BASE_URL}/${endpoint}`;
+      const defaultOptions = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      };
+
+      const fetchOptions = { ...defaultOptions, ...options };
+      
+      console.log(`📡 BaziCash API: ${fetchOptions.method} ${url}`);
+      
+      const response = await fetch(url, fetchOptions);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-    ]
+
+      const data = await response.json();
+      console.log('✅ API Response:', data);
+      
+      return { success: true, data };
+    } catch (error) {
+      console.error('❌ API Error:', error);
+      return { 
+        success: false, 
+        error: error.message,
+        message: 'Erro ao comunicar com o servidor. Tente novamente.'
+      };
+    }
+  },
+
+  /**
+   * Busca o saldo do cliente
+   * @returns {Promise<number>} Saldo disponível
+   */
+  async fetchBalance() {
+    if (!this.customerCPF) {
+      console.warn('⚠️ CPF não configurado');
+      return 0;
+    }
+
+    const result = await this.callAPI(`balance?cpf=${this.customerCPF}`);
+    
+    if (result.success && result.data) {
+      return result.data.available_balance || 0;
+    }
+    
+    return 0;
+  },
+
+  /**
+   * Realiza saque/resgate
+   * @param {number} amount - Valor a sacar
+   * @returns {Promise<object>} Resultado da operação
+   */
+  async withdrawBalance(amount) {
+    if (!this.customerCPF) {
+      return {
+        success: false,
+        message: 'CPF não configurado'
+      };
+    }
+
+    const result = await this.callAPI('withdraw', {
+      method: 'POST',
+      body: JSON.stringify({
+        cpf: this.customerCPF,
+        amount_bz: amount
+      })
+    });
+
+    return result;
   },
 
   // === FUNÇÕES DE MODAL ===
   openModal: function() {
     document.getElementById('bazicashModal').style.display = 'block';
     document.body.style.overflow = 'hidden'; // Previne scroll da página
+
+    // Carregar saldo (mockado por enquanto, depois será do SDK)
     this.loadBalance();
 
     // Usar event delegation para as abas (mais robusto)
@@ -129,78 +153,45 @@ const BaziCash = {
     return window.bazicashCustomerEmail || null;
   },
 
-  // === FUNÇÕES DE API ===
-  makeAppProxyRequest: async function(endpoint, data = null) {
-    const baseUrl = window.location.origin + '/apps/bazicash';
-
-    try {
-      const options = {
-        method: data ? 'POST' : 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        }
-      };
-
-      if (data) {
-        options.body = JSON.stringify(data);
-      }
-
-      const response = await fetch(`${baseUrl}${endpoint}`, options);
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Erro na requisição ao app proxy:', error);
-      throw error;
-    }
-  },
+  // === FUNÇÕES DE SALDO ===
 
   // === FUNÇÕES DE SALDO ===
   loadBalance: async function() {
     const balanceElement = document.getElementById('bazicashBalance');
-    const email = this.getCustomerEmail();
 
-    if (!email) {
-      balanceElement.textContent = 'R$ 125,50 (DEMO)';
-      this.updateFloatingButtonBadge(125.50); // Atualizar badge também
-      this.updateStats(); // Atualizar estatísticas também
-      this.loadHistory(); // Carregar histórico mesmo sem login para demonstração
-      this.showMessage('Visualização de demonstração - faça login para dados reais', 'warning');
+    if (!this.customerCPF) {
+      balanceElement.textContent = 'CPF não configurado';
+      this.updateFloatingButtonBadge(0);
+      this.showMessage('Configure seu CPF para acessar o BaziCash', 'warning');
       return;
     }
 
     try {
       balanceElement.textContent = 'Carregando...';
 
-      // Simulando delay da API
-      await new Promise(resolve => setTimeout(resolve, 800));
+      // Buscar saldo da API
+      const balance = await this.fetchBalance();
+      this.cachedBalance = balance;
 
-      // Usando dados mockados ao invés de fazer requisição real
-      balanceElement.textContent = `R$ ${this.MOCK_DATA.balance.toFixed(2)}`;
+      // Atualizar UI (convertendo para inteiro, pois 1 real = 1 BaziCash)
+      const bazicashAmount = Math.round(balance);
+      balanceElement.textContent = `${bazicashAmount} BaziCash`;
+      this.updateFloatingButtonBadge(bazicashAmount);
 
-      // Atualizar badge do botão flutuante
-      this.updateFloatingButtonBadge(this.MOCK_DATA.balance);
-
-      // Atualizar estatísticas
-      this.updateStats();
-
-      // Carregar histórico também
-      this.loadHistory();
+      console.log('✅ Saldo carregado:', balance);
 
     } catch (error) {
-      balanceElement.textContent = 'Erro ao carregar saldo';
-      this.showMessage('Erro de conexão. Tente novamente.', 'error');
+      console.error('❌ Erro ao carregar saldo:', error);
+      balanceElement.textContent = 'Erro ao carregar';
+      this.showMessage('Erro ao carregar saldo. Tente novamente.', 'error');
     }
   },
 
   updateFloatingButtonBadge: function(balance) {
     const badgeElement = document.getElementById('floatingButtonBadge');
     if (badgeElement) {
-      badgeElement.textContent = `R$ ${balance.toFixed(2)}`;
+      const bazicashAmount = Math.round(balance);
+      badgeElement.textContent = `${bazicashAmount} BZ`;
 
       // Adicionar animação de atualização
       badgeElement.style.transform = 'scale(1.2)';
@@ -211,8 +202,18 @@ const BaziCash = {
   },
 
   // === FUNÇÕES DE ESTATÍSTICAS ===
-  updateStats: function() {
-    const history = this.MOCK_DATA.history;
+  updateStats: function(history) {
+    if (!history || history.length === 0) {
+      // Sem histórico, zerar estatísticas
+      const totalGanhosEl = document.getElementById('totalGanhos');
+      const totalResgatesEl = document.getElementById('totalResgates');
+      const economiaGeradaEl = document.getElementById('economiaGerada');
+      
+      if (totalGanhosEl) totalGanhosEl.textContent = 'R$ 0,00';
+      if (totalResgatesEl) totalResgatesEl.textContent = 'R$ 0,00';
+      if (economiaGeradaEl) economiaGeradaEl.textContent = '0%';
+      return;
+    }
 
     // Calcular totais
     let totalGanhos = 0;
@@ -246,7 +247,70 @@ const BaziCash = {
   },
 
   // === FUNÇÕES DE HISTÓRICO ===
-  loadHistory: function(filterType = 'all') {
+  // === DADOS MOCKADOS ===
+  getMockHistory: function() {
+    return [
+      {
+        id: 1,
+        type: 'ganho',
+        description: 'Cashback da compra #1234',
+        amount: 150.00,
+        date: '2025-10-01T14:30:00',
+        formatted_date: '01/10/2025 às 14:30'
+      },
+      {
+        id: 2,
+        type: 'ganho',
+        description: 'Cashback da compra #1235',
+        amount: 320.50,
+        date: '2025-09-28T10:15:00',
+        formatted_date: '28/09/2025 às 10:15'
+      },
+      {
+        id: 3,
+        type: 'resgate',
+        description: 'Resgate de BaziCash',
+        amount: -200.00,
+        date: '2025-09-25T16:45:00',
+        formatted_date: '25/09/2025 às 16:45'
+      },
+      {
+        id: 4,
+        type: 'ganho',
+        description: 'Cashback da compra #1230',
+        amount: 450.00,
+        date: '2025-09-20T11:20:00',
+        formatted_date: '20/09/2025 às 11:20'
+      },
+      {
+        id: 5,
+        type: 'resgate',
+        description: 'Resgate de BaziCash',
+        amount: -500.00,
+        date: '2025-09-15T09:00:00',
+        formatted_date: '15/09/2025 às 09:00'
+      },
+      {
+        id: 6,
+        type: 'ganho',
+        description: 'Cashback da compra #1225',
+        amount: 680.00,
+        date: '2025-09-10T15:30:00',
+        formatted_date: '10/09/2025 às 15:30'
+      },
+      {
+        id: 7,
+        type: 'ganho',
+        description: 'Cashback da compra #1220',
+        amount: 1549.50,
+        date: '2025-09-05T13:10:00',
+        formatted_date: '05/09/2025 às 13:10'
+      }
+    ];
+  },
+
+  // === HISTÓRICO ===
+  loadHistory: async function(filterType = 'all') {
     const historyContainer = document.getElementById('bazicashHistory');
 
     if (!historyContainer) {
@@ -254,47 +318,64 @@ const BaziCash = {
       return;
     }
 
-    let history = this.MOCK_DATA.history;
+    historyContainer.innerHTML = '<div class="bazicash-loading">Carregando histórico...</div>';
 
-    // Filtrar por tipo se necessário
-    if (filterType === 'ganhos') {
-      history = history.filter(item => item.type === 'ganho');
-    } else if (filterType === 'resgates') {
-      history = history.filter(item => item.type === 'resgate');
-    }
-
-    // Ordenar por data (mais recente primeiro)
-    history = history.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-    if (history.length === 0) {
-      historyContainer.innerHTML = '<div class="bazicash-empty-history">Nenhuma transação encontrada para este filtro.</div>';
+    // Se modo MOCK estiver ativado, usar dados mockados
+    if (this.USE_MOCK_DATA) {
+      setTimeout(() => {
+        const mockHistory = this.getMockHistory();
+        this.cachedHistory = mockHistory;
+        this.renderHistory(mockHistory, filterType);
+        this.updateStats(mockHistory);
+      }, 500);
       return;
     }
 
-    // Debug: Forçar exibição se estiver vazio
-    if (!historyContainer.innerHTML || historyContainer.innerHTML.includes('Carregando')) {
-      // Container estava vazio, vamos popular
+    // TODO: Implementar quando endpoint de histórico estiver disponível
+    historyContainer.innerHTML = '<div class="bazicash-empty-history">Histórico em breve! 🚀</div>';
+  },
+
+  renderHistory: function(history, filterType = 'all') {
+    const historyContainer = document.getElementById('bazicashHistory');
+
+    if (!history || history.length === 0) {
+      historyContainer.innerHTML = '<div class="bazicash-empty-history">Nenhuma transação encontrada</div>';
+      return;
     }
 
-    let historyHTML = '';
-    history.forEach((item, index) => {
-      const formattedDate = new Date(item.date).toLocaleDateString('pt-BR');
-      const amountClass = item.type;
-      const amountText = item.type === 'ganho' ? `+R$ ${item.amount.toFixed(2)}` : `R$ ${item.amount.toFixed(2)}`;
-      const animationDelay = index * 0.1; // Delay escalonado
+    // Filtrar por tipo
+    let filteredHistory = history;
+    if (filterType === 'ganhos') {
+      filteredHistory = history.filter(item => item.type === 'ganho');
+    } else if (filterType === 'resgates') {
+      filteredHistory = history.filter(item => item.type === 'resgate');
+    }
 
-      historyHTML += `
-        <div class="bazicash-history-item" style="animation-delay: ${animationDelay}s">
+    if (filteredHistory.length === 0) {
+      historyContainer.innerHTML = '<div class="bazicash-empty-history">Nenhuma transação encontrada nesta categoria</div>';
+      return;
+    }
+
+    // Renderizar itens
+    let html = '';
+    filteredHistory.forEach((item, index) => {
+      const amountClass = item.type === 'ganho' ? 'ganho' : 'resgate';
+      const amountPrefix = item.type === 'ganho' ? '+' : '';
+
+      html += `
+        <div class="bazicash-history-item" style="animation-delay: ${index * 0.05}s">
           <div class="bazicash-history-info">
             <div class="bazicash-history-description">${item.description}</div>
-            <div class="bazicash-history-date">${formattedDate}</div>
+            <div class="bazicash-history-date">${item.formatted_date}</div>
           </div>
-          <div class="bazicash-history-amount ${amountClass}">${amountText}</div>
+          <div class="bazicash-history-amount ${amountClass}">
+            ${amountPrefix}R$ ${Math.abs(item.amount).toFixed(2).replace('.', ',')}
+          </div>
         </div>
       `;
     });
 
-    historyContainer.innerHTML = historyHTML;
+    historyContainer.innerHTML = html;
   },
 
   switchHistoryTab: function(tabType) {
@@ -313,8 +394,10 @@ const BaziCash = {
 
   // Handler para cliques nas abas usando event delegation
   handleTabClick: function(event) {
-    if (event.target.classList.contains('bazicash-tab-btn')) {
-      const tabType = event.target.getAttribute('data-tab');
+    // Encontrar o botão (pode ser clicado no span ou no botão)
+    const button = event.target.closest('.bazicash-tab-btn');
+    if (button) {
+      const tabType = button.getAttribute('data-tab');
       if (tabType) {
         BaziCash.switchHistoryTab(tabType);
       }
@@ -325,11 +408,10 @@ const BaziCash = {
   redeem: async function() {
     const amountInput = document.getElementById('redeemAmount');
     const redeemBtn = document.querySelector('.bazicash-redeem-btn');
-    const email = this.getCustomerEmail();
     const amount = parseFloat(amountInput.value);
 
-    if (!email) {
-      this.showMessage('É necessário estar logado para resgatar Bazicash', 'error');
+    if (!this.customerCPF) {
+      this.showMessage('CPF não configurado', 'error');
       return;
     }
 
@@ -338,36 +420,107 @@ const BaziCash = {
       return;
     }
 
+    // Validar saldo suficiente (cache local)
+    if (this.cachedBalance && amount > this.cachedBalance) {
+      this.showMessage(`Saldo insuficiente. Disponível: R$ ${this.cachedBalance.toFixed(2)}`, 'warning');
+      return;
+    }
+
     try {
       redeemBtn.disabled = true;
-      redeemBtn.textContent = 'Processando...';
+      redeemBtn.innerHTML = '<span class="btn-icon">⏳</span> Processando...';
       this.clearMessage();
 
-      const response = await this.makeAppProxyRequest('/redeem', {
-        customer_email: email,
-        amount: amount
-      });
+      // Fazer requisição para API de saque
+      const result = await this.withdrawBalance(amount);
 
-      if (response.success) {
-        this.showMessage(response.message || 'Resgate realizado com sucesso!', 'success');
+      if (result.success && result.data) {
+        this.showMessage('Resgate realizado com sucesso! 🎉', 'success');
         amountInput.value = '';
-        // Atualiza o saldo após o resgate
-        setTimeout(() => this.loadBalance(), 1000);
+        
+        // Atualizar saldo com o novo valor retornado
+        if (result.data.new_balance !== undefined) {
+          this.cachedBalance = result.data.new_balance;
+          const balanceElement = document.getElementById('bazicashBalance');
+          const bazicashAmount = Math.round(result.data.new_balance);
+          if (balanceElement) {
+            balanceElement.textContent = `${bazicashAmount} BaziCash`;
+          }
+          this.updateFloatingButtonBadge(bazicashAmount);
+        } else {
+          // Se não retornou novo saldo, recarregar
+          setTimeout(() => this.loadBalance(), 1000);
+        }
       } else {
-        this.showMessage(response.message || 'Erro ao processar resgate', 'error');
+        this.showMessage(result.message || 'Erro ao processar resgate', 'error');
       }
     } catch (error) {
+      console.error('❌ Erro no resgate:', error);
       this.showMessage('Erro de conexão. Tente novamente.', 'error');
     } finally {
       redeemBtn.disabled = false;
-      redeemBtn.textContent = 'Resgatar';
+      redeemBtn.innerHTML = '<span class="btn-icon">💸</span> Resgatar';
     }
   },
 
   // === INICIALIZAÇÃO ===
   init: function() {
+    console.log('🚀 BaziCash inicializando...');
+
+    // Configurar CPF e email do cliente (vem do Liquid template)
+    this.customerCPF = window.bazicashCustomerCPF || null;
+    this.customerEmail = window.bazicashCustomerEmail || null;
+
+    // Se modo MOCK, definir saldo mockado
+    if (this.USE_MOCK_DATA) {
+      this.cachedBalance = 2450;
+      console.log('🎭 MODO MOCK ATIVADO - Usando dados de exemplo');
+    }
+
+    console.log('📋 Cliente configurado:', {
+      cpf: this.customerCPF ? '***' : 'não definido',
+      email: this.customerEmail || 'não definido'
+    });
+    
     // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('✅ DOM carregado - Iniciando BaziCash');
+
+      // Carregar histórico automaticamente se estiver na página
+      const historyContainer = document.getElementById('bazicashHistory');
+      if (historyContainer) {
+        console.log('📊 Carregando histórico...');
+        this.loadHistory('all');
+
+        // Adicionar event listeners para as abas
+        const historyTabs = document.querySelector('.bazicash-history-tabs');
+        if (historyTabs) {
+          historyTabs.addEventListener('click', (e) => {
+            const button = e.target.closest('.bazicash-tab-btn');
+            if (button) {
+              const tabType = button.getAttribute('data-tab');
+              if (tabType) {
+                this.switchHistoryTab(tabType);
+              }
+            }
+          });
+          console.log('✅ Event listeners das abas adicionados');
+        }
+      }
+
+      // Adicionar event listener ao botão flutuante
+      const floatingButton = document.getElementById('bazicashFloatingButton');
+      if (floatingButton) {
+        floatingButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('🔘 Botão clicado via event listener');
+          this.openModal();
+        });
+        console.log('✅ Event listener adicionado ao botão flutuante');
+      } else {
+        console.warn('⚠️ Botão flutuante não encontrado no DOM');
+      }
+
       // Permite resgate com Enter
       const amountInput = document.getElementById('redeemAmount');
       if (amountInput) {
@@ -386,6 +539,8 @@ const BaziCash = {
         this.closeModal();
       }
     };
+    
+    console.log('✅ BaziCash inicializado com sucesso');
   }
 };
 

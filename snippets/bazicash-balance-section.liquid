@@ -4,36 +4,33 @@
   Uso: {% render 'bazicash-balance-section' %}
 {%- endcomment -%}
 
+{%- liquid
+  # MODO MOCK: Ative para visualizar com dados de exemplo
+  assign use_mock_data = true
+  assign mock_balance = 2450
+
+  # Buscar saldo do StoreCredit do cliente logado
+  assign store_credit_balance = 0
+  if customer and customer.store_credit_accounts.size > 0
+    assign store_credit_balance = customer.store_credit_accounts.first.balance.amount
+  endif
+-%}
+
 <div class="bazicash-section">
   <h3>💳 Saldo Disponível</h3>
   <div class="bazicash-balance">
-    <div class="bazicash-balance-icon">💰</div>
-    <span id="bazicashBalance">Carregando...</span>
-    <p class="bazicash-balance-subtitle">Disponível para resgate</p>
-  </div>
-
-  <!-- Estatísticas adicionais -->
-  <div class="bazicash-stats">
-    <div class="bazicash-stat-item">
-      <div class="stat-icon">📈</div>
-      <div class="stat-content">
-        <div class="stat-value" id="totalGanhos">R$ 260,50</div>
-        <div class="stat-label">Total de Ganhos</div>
-      </div>
+    <div class="bazicash-balance-display">
+      <img src="{{ 'bazicash-icon.png' | asset_url }}" alt="BaziCash" class="bazicash-balance-icon">
+      <span id="bazicashBalance">
+        {%- if use_mock_data -%}
+          {{ mock_balance }} BaziCash
+        {%- elsif customer -%}
+          {{ store_credit_balance | money_without_currency | replace: ',', '.' | times: 1 | round }} BaziCash
+        {%- else -%}
+          0 BaziCash
+        {%- endif -%}
+      </span>
     </div>
-    <div class="bazicash-stat-item">
-      <div class="stat-icon">💸</div>
-      <div class="stat-content">
-        <div class="stat-value" id="totalResgates">R$ 135,00</div>
-        <div class="stat-label">Total Resgatado</div>
-      </div>
-    </div>
-    <div class="bazicash-stat-item">
-      <div class="stat-icon">🎯</div>
-      <div class="stat-content">
-        <div class="stat-value" id="economiaGerada">48%</div>
-        <div class="stat-label">Economia Gerada</div>
-      </div>
-    </div>
+    <p class="bazicash-balance-subtitle">A cada R$ 1,00 gasto = 1 BaziCash</p>
   </div>
 </div>

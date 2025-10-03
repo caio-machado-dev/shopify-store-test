@@ -1,0 +1,234 @@
+{%- comment -%}
+  ===========================================
+  BAZICASH - Página de Cashback
+  Seção principal para a página dedicada do BaziCash
+  ===========================================
+
+  Arquivos relacionados:
+  - CSS: assets/bazicash.css
+  - JavaScript: assets/bazicash.js
+  - Template: templates/page.bazicash.json
+  - Snippets:
+    - snippets/bazicash-balance-section.liquid
+    - snippets/bazicash-redeem-section.liquid
+    - snippets/bazicash-history-section.liquid
+{%- endcomment -%}
+
+{%- comment -%} Incluir CSS do BaziCash {%- endcomment -%}
+{{ 'bazicash.css' | asset_url | stylesheet_tag }}
+{{ 'section-main-page.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+
+  .bazicash-page-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .bazicash-page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .bazicash-page-header h1 {
+    font-family: 'Lemon Milk', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 700;
+    letter-spacing: -0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .bazicash-page-header .bazicash-tagline {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+    letter-spacing: -0.08em;
+    color: #666;
+  }
+
+  .bazicash-page-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .bazicash-banner-wrapper {
+    margin-bottom: 2.5rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: #f9f9f9;
+  }
+
+  .bazicash-banner-image {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-width: 100%;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  @media screen and (max-width: 749px) {
+    .bazicash-page-header h1 {
+      font-size: 2.5rem;
+    }
+
+    .bazicash-page-header .bazicash-tagline {
+      font-size: 1.1rem;
+    }
+
+    .bazicash-page-content {
+      padding: 1.5rem;
+    }
+
+    .bazicash-banner-wrapper {
+      margin-bottom: 2rem;
+      border-radius: 8px;
+    }
+  }
+{%- endstyle -%}
+
+<div class="page-width section-{{ section.id }}-padding">
+  <div class="bazicash-page-container">
+    <div class="bazicash-page-header">
+      {%- comment -%} Substitua 'bazicash-icon.png' pelo nome do seu arquivo PNG {%- endcomment -%}
+      <h1>BaziCash</h1>
+      <p class="bazicash-tagline">Seu programa de cashback inteligente</p>
+    </div>
+
+    <div class="bazicash-page-content">
+      {%- comment -%} Banner explicativo - Como funciona o BaziCash {%- endcomment -%}
+      <div class="bazicash-banner-wrapper">
+        <img
+          src="{{ 'banner-bzh.png' | asset_url }}"
+          srcset="{{ 'banner-bzh.png' | asset_url }} 1x,
+                  {{ 'banner-bzh@2x.png' | asset_url }} 2x"
+          alt="Como funciona o programa BaziCash"
+          class="bazicash-banner-image"
+          loading="eager"
+          decoding="async"
+        >
+      </div>
+
+      {% render 'bazicash-balance-section' %}
+      {% render 'bazicash-redeem-section' %}
+      {% render 'bazicash-history-section' %}
+
+      <div class="bazicash-section">
+        <div id="bazicashMessage" class="bazicash-message"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Configuração JavaScript - ANTES do script {%- endcomment -%}
+<script>
+  // Configurar dados do cliente globalmente
+  {% if customer %}
+    window.bazicashCustomerEmail = '{{ customer.email }}';
+    window.bazicashCustomerId = '{{ customer.id }}';
+    window.bazicashCustomerName = '{{ customer.first_name }} {{ customer.last_name }}';
+    window.bazicashCustomerCPF = '{{ customer.metafields.custom.cpf | default: "" }}';
+  {% else %}
+    window.bazicashCustomerEmail = null;
+    window.bazicashCustomerId = null;
+    window.bazicashCustomerName = null;
+    window.bazicashCustomerCPF = null;
+  {% endif %}
+</script>
+
+{%- comment -%} Incluir JavaScript do BaziCash {%- endcomment -%}
+<script src="{{ 'bazicash.js' | asset_url }}" async></script>
+
+{%- comment -%} Configurar BaziCash APÓS o script carregar {%- endcomment -%}
+<script>
+  // Aguarda o bazicash.js carregar antes de configurar
+  function waitForBaziCash(callback) {
+    if (typeof BaziCash !== 'undefined') {
+      callback();
+    } else {
+      setTimeout(function () {
+        waitForBaziCash(callback);
+      }, 50);
+    }
+  }
+
+  // Aguarda DOM e configura BaziCash
+  function configureBaziCash() {
+    waitForBaziCash(function () {
+      console.log('🔍 BaziCash: Configurando...');
+
+      // Configura dados do cliente
+      BaziCash.customerCPF = window.bazicashCustomerCPF;
+      BaziCash.customerEmail = window.bazicashCustomerEmail;
+      console.log('✅ BaziCash configurado:', {
+        cpf: BaziCash.customerCPF ? '***' : 'não definido',
+        email: BaziCash.customerEmail,
+      });
+    });
+  }
+
+  // Executa quando DOM estiver pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', configureBaziCash);
+  } else {
+    configureBaziCash();
+  }
+</script>
+
+{% schema %}
+{
+  "name": "BaziCash - Página",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Espaçamento"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Espaçamento superior",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "label": "Espaçamento inferior",
+      "default": 36
+    },
+    {
+      "type": "header",
+      "content": "ℹ️ Informações"
+    },
+    {
+      "type": "paragraph",
+      "content": "Esta seção é utilizada no template 'page.bazicash.json'. Crie uma página no admin da Shopify e selecione o template 'bazicash' para usar esta seção."
+    }
+  ]
+}
+{% endschema %}
